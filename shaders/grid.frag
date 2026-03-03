@@ -13,6 +13,7 @@ uniform vec4 uLineColor;
 uniform float uIntersectionRadius;
 uniform vec4 uIntersectionColor;
 uniform vec4 uViewport;
+uniform float uZoom;
 
 out vec4 fragColor;
 
@@ -24,16 +25,20 @@ float smoothStep(float edge0, float edge1, float x) {
 
 // Line antialiasing function
 float getLineAlpha(float dist, float lineWidth) {
-    float halfWidth = lineWidth * 0.5;
-    float pixelRange = 1.0; // Adjust this value to control antialiasing spread
-    
+    // Scale line width to screen pixels so it stays consistent across zoom levels
+    float scaledWidth = lineWidth / uZoom;
+    float halfWidth = scaledWidth * 0.5;
+    float pixelRange = 1.0 / uZoom;
+
     return 1.0 - smoothStep(halfWidth - pixelRange, halfWidth + pixelRange, dist);
 }
 
 // Circle antialiasing function
 float getCircleAlpha(float dist, float radius) {
-    float pixelRange = 1.0; // Adjust this value to control antialiasing spread
-    return 1.0 - smoothStep(radius - pixelRange, radius + pixelRange, dist);
+    // Scale radius to screen pixels so it stays consistent across zoom levels
+    float scaledRadius = radius / uZoom;
+    float pixelRange = 1.0 / uZoom;
+    return 1.0 - smoothStep(scaledRadius - pixelRange, scaledRadius + pixelRange, dist);
 }
 
 void main() {
